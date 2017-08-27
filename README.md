@@ -13,13 +13,13 @@ To build docker image, from within this repository:
 
 
 ```bash
-docker build -t storj-integration .
+docker build -t digi-integration .
 ```
 
 Create a persistent container, ports for the bridge and farmers are exposed for testing uploading and downloading:
 
 ```bash
-docker create -p 8080:8080 -p 9000:9000 -p 9001:9001 -p 9002:9002 -p 9003:9003 -p 9004:9004 -p 9005:9005 -p 9006:9006 -p 9007:9007 -p 9008:9008 -p 9009:9009 -p 9010:9010 -p 9011:9011 -p 9012:9012 -p 9013:9013 -p 9014:9014 -p 9015:9015 -p 9016:9016 -t -i storj-integration bash
+docker create -p 8080:8080 -p 9000:9000 -p 9001:9001 -p 9002:9002 -p 9003:9003 -p 9004:9004 -p 9005:9005 -p 9006:9006 -p 9007:9007 -p 9008:9008 -p 9009:9009 -p 9010:9010 -p 9011:9011 -p 9012:9012 -p 9013:9013 -p 9014:9014 -p 9015:9015 -p 9016:9016 -t -i digi-integration bash
 ```
 
 And to start and attach to the container:
