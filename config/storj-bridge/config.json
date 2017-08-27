@@ -1,0 +1,43 @@
+{
+  "storage": {
+    "mongoUrl": "mongodb://127.0.0.1:27017/storj-sandbox",
+    "mongoOpts": {}
+  },
+  "server": {
+    "host": "localhost",
+    "port": 8080,
+    "timeout": 240000,
+    "ssl": {
+      "cert": null,
+      "key": null,
+      "ca": [],
+      "redirect": 80
+    },
+    "public": {
+      "host": "localhost",
+      "port": 8080
+    }
+  },
+  "complex": {
+    "rpcUrl": "http://localhost:8081",
+    "rpcUser": "user",
+    "rpcPassword": "pass"
+  },
+  "logger": {
+    "level": 4
+  },
+  "mailer": {
+    "host": "smtp.mailtrap.io",
+    "port": 2525,
+    "secure": false,
+    "auth": {
+      "user": "5bfff3a7f86ca2",
+      "pass": "73f8650e11dd7a"
+    },
+    "from": "someone@digipulse.io"
+  },
+  "redis": {
+    "host": "localhost",
+    "port": 6379
+  }
+}
