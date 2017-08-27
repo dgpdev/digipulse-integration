@@ -1,91 +1,84 @@
-[![Storj Bridge](https://nodei.co/npm/storj-bridge.png?downloads=true)](http://storj.github.io/bridge)
-=======================================================================================================
+Storj integration/staging tree
+==============================
 
-[![Build Status](https://img.shields.io/travis/Storj/bridge.svg?style=flat-square)](https://travis-ci.org/Storj/bridge)
-[![Coverage Status](https://img.shields.io/coveralls/Storj/bridge.svg?style=flat-square)](https://coveralls.io/r/Storj/bridge)
-[![NPM](https://img.shields.io/npm/v/storj-bridge.svg?style=flat-square)](https://www.npmjs.com/package/storj-bridge)
-[![GitHub license](https://img.shields.io/badge/license-AGPLv3-blue.svg?style=flat-square)](https://raw.githubusercontent.com/Storj/data-api/master/LICENSE)
+This repository is for development and integration testing of all of the distributed Storj network services.
 
-Access the [Storj](http://storj.io) network via simple REST API.
+## Development
 
-Quick Start
------------
+To update a module in the container, change the `package.json` before building the image. It's best to use specific git hashes in the form `storj/bridge#bd62050f1585278e6cbf18e620b6501f814359e3` as the version to bust the build cache for testing development branches.
 
-Install MongoDB, Git and Wget:
+## Build
 
-```
-apt-get install mongodb git wget
-```
+To build docker image, from within this repository:
 
-Install NVM, Node.js and NPM:
 
-```
-wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.30.1/install.sh | bash
-source ~/.profile
-nvm install --lts
+```bash
+docker build -t storj-integration .
 ```
 
-Clone the repository, install dependencies:
+Create a persistent container, ports for the bridge and farmers are exposed for testing uploading and downloading:
 
-```
-git clone https://github.com/Storj/bridge.git && cd bridge
-npm install && npm link
-```
-
-Start the server (set the `NODE_ENV` environment variable to specify the config):
-
-```
-NODE_ENV=develop storj-bridge
+```bash
+docker create -p 8080:8080 -p 9000:9000 -p 9001:9001 -p 9002:9002 -p 9003:9003 -p 9004:9004 -p 9005:9005 -p 9006:9006 -p 9007:9007 -p 9008:9008 -p 9009:9009 -p 9010:9010 -p 9011:9011 -p 9012:9012 -p 9013:9013 -p 9014:9014 -p 9015:9015 -p 9016:9016 -t -i storj-integration bash
 ```
 
-> **Note:** Storj Bridge cannot communicate with the network on it's own, but 
-> instead must communicate with a running 
-> [Storj Complex](https://github.com/Storj/complex) instance.
+And to start and attach to the container:
 
-This will use the configuration file located at `~/.storj-bridge/config/develop.json`.
-
-Windows
--------
-
-Install utilizing automated script
-
-```
-https://github.com/Storj/storj-automation/archive/master.zip
+```bash
+docker start -a -i <hash_of_container>
 ```
 
-The default configuration can be modified as needed.  It is located at
+## Running the Sandbox
+
+To run a *sandbox* test network:
+
+First edit the file at `./config/storj-bridge/config.json` to point to a
+email server, so that you can test the mailer and registration.
+
+And then run this script to start everything *(16 farmers, 6 renters and 1 bridge)*:
+```bash
+./scripts/start_everything.sh
+```
+
+You can then use pm2 to look at logs and status for each service by name:
+```
+pm2 status
+pm2 log
+pm2 log bridge --lines 100
+pm2 log renter-6
+pm2 log farmer-4
+pm2 stop farmer-4
+```
+
+And check that mongo has the data that is expected:
+```
+mongo
+use storj-sandbox
+```
+
+Modify files for testing purposes:
+```
+vim ./node_modules/storj-bridge/lib/constants.js
+```
+
+To stop all of the services, and exit the container:
+```
+./scripts/stop_everything.sh
+exit
+```
+
+## Testing File Transfers
+
+Using the CLI included with https://github.com/Storj/libstorj you can register and transfer files for development and testing.
 
 ```
-%USERPROFILE%\.storj-bridge\config
+STORJ_BRIDGE=http://localhost:8080 ./src/storj register
 ```
 
-Edit `production` in notepad/wordpad. For more information, see [the documentation](http://storj.github.io/bridge).
+And then check your email and activate the account, and then add buckets and files:
 
-License
--------
-
-Storj Bridge - Access The Storj Network via REST Interface  
-Copyright (C) 2017 Storj Labs, Inc
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see http://www.gnu.org/licenses/.
-
-Terms
------
-
-This software is released for testing purposes only. We make no guarantees with
-respect to its function. By using this software you agree that Storj is not
-liable for any damage to your system. You also agree not to upload illegal
-content, content that infringes on other's IP, or information that would be
-protected by HIPAA, FERPA, or any similar standard. Generally speaking, you
-agree to test the software responsibly. We'd love to hear feedback too.
+```
+STORJ_BRIDGE=http://localhost:8080 ./src/storj add-bucket
+STORJ_BRIDGE=http://localhost:8080 ./src/storj upload-file <bucket_hash> <filename>
+STORJ_BRIDGE=http://localhost:8080 ./src/storj download-file <bucket_hash> <file_hash>
+```
